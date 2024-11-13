@@ -50,3 +50,4 @@ CMakeUserPresets.json
 
 # Generated files
 build/
+.cache/
