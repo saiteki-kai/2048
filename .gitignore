@@ -47,7 +47,11 @@ CMakeUserPresets.json
 
 # IDE
 .vscode/
+.idea/
 
 # Generated files
 build/
 .cache/
+cmake-build-debug/
+cmake-build-release/
+assets/
