@@ -1,0 +1,6 @@
+Checks: "clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,-cppcoreguidelines-avoid-magic-numbers,performance-*,google-*,modernize-*"
+UseColor: true
+
+CheckOptions:
+  - key: "readability-magic-numbers.IgnoredIntegerValues"
+    value: "{2048}"
