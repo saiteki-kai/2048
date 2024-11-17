@@ -2,6 +2,17 @@
 
 #include "grid.h"
 
+enum class Direction : std::int8_t
+{
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT
+};
+
+constexpr double PROB_2 = 0.9;
+constexpr double PROB_4 = 0.1;
+
 class Game
 {
   private:
@@ -18,9 +29,12 @@ class Game
     void Start();
     void Reset();
     auto CheckWin() -> bool;
-    auto CanMove() -> bool;
     void Move(Direction dir);
     auto Spawn() -> bool;
     [[nodiscard]] auto Score() const -> std::uint32_t;
     [[nodiscard]] auto BestScore() const -> std::uint32_t;
+    auto MoveRow(size_t row, Direction dir) -> uint8_t;
+    auto MoveCol(size_t col, Direction dir) -> uint8_t;
+    auto CanMove() -> bool;
+    auto SpawnRandomTile() -> bool;
 };
