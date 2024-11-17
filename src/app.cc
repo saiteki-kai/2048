@@ -35,11 +35,7 @@ constexpr auto GetGridTileRect(const size_t row, const size_t col) -> SDL_FRect
     return rect;
 }
 
-Application::Application() : Application(GridStyle::N_ROWS, GridStyle::N_COLS)
-{
-}
-
-Application::Application(const int rows, const int cols) : game(rows, cols), window(nullptr), renderer(nullptr)
+Application::Application() : window(nullptr), renderer(nullptr)
 {
     SDL_Init(SDL_INIT_VIDEO);
 
@@ -93,16 +89,16 @@ void Application::Run()
 
 void Application::CheckWin()
 {
-    const auto can_spawn = game.Spawn();
+    game.Spawn();
 
-    if (!game.CanMove() && !can_spawn)
-    {
-        std::cout << "Game Over\n";
-        // TODO: display game over screen
-        // TODO: reset game
-        SDL_Delay(3000);
-        game.Reset();
-    }
+    // if (!game.CanMove())
+    // {
+    //     std::cout << "Game Over\n";
+    //     // TODO: display game over screen
+    //     // TODO: reset game
+    //     SDL_Delay(3000);
+    //     game.Reset();
+    // }
 
     if (game.CheckWin())
     {
@@ -176,16 +172,14 @@ void Application::OnRender()
     SDL_RenderPresent(renderer);
 }
 
-void Application::DrawGrid(Grid &grid) const
+void Application::DrawGrid(const Grid &grid) const
 {
-    const auto [rows, cols] = grid.GetSize();
-
-    for (int row = 0; row < rows; ++row)
+    for (int row = 0; row < grid.Rows(); ++row)
     {
-        for (int col = 0; col < cols; ++col)
+        for (int col = 0; col < grid.Cols(); ++col)
         {
             SDL_FRect rect = GetGridTileRect(row, col);
-            Tile &tile = grid.GetTile(row, col);
+            const Tile &tile = grid.GetTile(row, col);
             DrawTile(tile, rect);
         }
     }

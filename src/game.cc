@@ -1,8 +1,9 @@
 #include "game.h"
 
-Game::Game(const int rows, const int cols) : rows(rows), cols(cols), grid(rows, cols)
+#include <iostream>
+
+Game::Game() : rows(grid.Rows()), cols(grid.Cols())
 {
-    Start();
 }
 
 auto Game::GetGrid() -> Grid &
@@ -12,7 +13,7 @@ auto Game::GetGrid() -> Grid &
 
 void Game::Start()
 {
-    grid.InitTiles();
+    grid.Init();
     grid.SpawnRandomTile();
     grid.SpawnRandomTile();
 }

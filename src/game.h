@@ -5,15 +5,15 @@
 class Game
 {
   private:
-    int rows;
-    int cols;
     Grid grid;
+    size_t rows = 0;
+    size_t cols = 0;
     bool can_move = true;
     std::uint32_t score = 0;
     std::uint32_t best_score = 0;
 
   public:
-    Game(int rows, int cols);
+    Game();
     auto GetGrid() -> Grid &;
     void Start();
     void Reset();

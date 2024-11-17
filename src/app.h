@@ -17,7 +17,6 @@ class Application
 
   public:
     Application();
-    Application(int rows, int cols);
     ~Application();
 
     void Run();
@@ -25,7 +24,7 @@ class Application
     void OnRender();
     void CheckWin();
     void OnEvent(const SDL_Event &event);
-    void DrawGrid(Grid &grid) const;
+    void DrawGrid(const Grid &grid) const;
     void DrawTile(const Tile &tile, const SDL_FRect &rect) const;
     void DrawText(const char *text, const SDL_FRect &rect, const TileStyle &style) const;
 };

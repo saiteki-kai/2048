@@ -2,6 +2,6 @@
 
 auto main(int argc, char **argv) -> int
 {
-    auto app = Application(4, 1);
+    auto app = Application();
     app.Run();
 }

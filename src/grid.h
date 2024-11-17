@@ -1,23 +1,17 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
-#include <iostream>
-#include <vector>
+#include <random>
 
 struct Tile
 {
     size_t row;
     size_t col;
-    int value;
+    uint16_t value;
 };
 
-struct Size
-{
-    size_t width;
-    size_t height;
-};
-
-enum Direction : std::int8_t
+enum class Direction : std::int8_t
 {
     UP,
     DOWN,
@@ -31,39 +25,24 @@ constexpr double PROB_4 = 0.1;
 class Grid
 {
   private:
-    size_t n_rows;
-    size_t n_cols;
-    std::vector<std::vector<Tile>> tiles;
+    size_t n_rows = 4;
+    size_t n_cols = 4;
+    std::array<Tile, 16> tiles = {};
 
   private:
-    [[nodiscard]] auto CheckPosition(size_t row, size_t col) const -> bool;
+    [[nodiscard]] auto IsValidPosition(size_t row, size_t col) const -> bool;
 
   public:
-    Grid(size_t rows, size_t cols);
-    auto GetTile(size_t row, size_t col) -> Tile &;
-    void SetTile(Tile &tile, size_t row, size_t col, int value) const;
+    [[nodiscard]] auto Rows() const -> size_t;
+    [[nodiscard]] auto Cols() const -> size_t;
+    [[nodiscard]] auto GetTile(size_t row, size_t col) const -> const Tile &;
+    void Init();
+    auto IsEmpty(size_t row, size_t col) -> bool;
     void SetTile(const Tile &tile, int value);
     void SetTile(size_t row, size_t col, int value);
-    static auto IsEmpty(const Tile &tile) -> bool;
-    auto IsEmpty(size_t row, size_t col) -> bool;
-    [[nodiscard]] auto GetSize() const -> Size;
-    void InitTiles();
-    auto SpawnRandomTile() -> bool;
-    auto CanMove() -> bool;
+    auto GetTile(size_t row, size_t col) -> Tile &;
     auto MoveRow(size_t row, Direction dir) -> uint8_t;
     auto MoveCol(size_t col, Direction dir) -> uint8_t;
-    auto Debug()
-    {
-        for (size_t x = 0; x < n_rows; ++x)
-        {
-            for (size_t y = 0; y < n_cols; ++y)
-            {
-                Tile *tile = &tiles[x][y];
-                // std::cout << std::format("{},{}: x:{}, y:{}, value:{}", x, y,
-                // tile->x, tile->y, tile->value);
-                std::cout << tile->value << " ";
-            }
-            std::cout << "\n";
-        }
-    }
+    auto CanMove() -> bool;
+    auto SpawnRandomTile() -> bool;
 };
