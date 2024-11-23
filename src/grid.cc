@@ -54,6 +54,27 @@ auto Grid::GetTile(const size_t row, const size_t col) const -> const Tile &
     return tiles.at(row * n_cols + col);
 }
 
+auto Grid::AdjacentTiles(size_t row, size_t col) const -> std::vector<Tile>
+{
+    if (!IsValidPosition(row, col))
+    {
+        const std::string msg = std::format("{} x {} is out of range. Grid size: ({}, {})", row, col, n_rows, n_cols);
+        throw std::out_of_range(msg);
+    }
+
+    std::vector<Tile> neighbours(4);
+
+    for (const auto &[row_off, col_off] : std::vector<std::pair<int, int>>{{0, 1}, {0, -1}, {1, 0}, {-1, 0}})
+    {
+        if (IsValidPosition(row + row_off, col + col_off))
+        {
+            neighbours.push_back(GetTile(row + row_off, col + col_off));
+        }
+    }
+
+    return neighbours;
+}
+
 void Grid::SetTile(const size_t row, const size_t col, const int value)
 {
     GetTile(row, col).value = value;

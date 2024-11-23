@@ -4,10 +4,6 @@
 #include <iostream>
 #include <random>
 
-Game::Game() : rows(grid.Rows()), cols(grid.Cols())
-{
-}
-
 auto Game::GetGrid() -> Grid &
 {
     return grid;
@@ -16,8 +12,8 @@ auto Game::GetGrid() -> Grid &
 void Game::Start()
 {
     grid.Init();
-    SpawnRandomTile();
-    SpawnRandomTile();
+    Spawn();
+    Spawn();
 }
 
 void Game::Reset()
@@ -38,26 +34,20 @@ void Game::Move(const Direction dir)
 
     if (dir == Direction::UP or dir == Direction::DOWN)
     {
-        for (size_t col = 0; col < cols; ++col)
+        for (size_t col = 0; col < grid.Cols(); ++col)
         {
             move_score = MoveCol(col, dir);
         }
     }
     else
     {
-        for (size_t row = 0; row < rows; ++row)
+        for (size_t row = 0; row < grid.Rows(); ++row)
         {
             move_score += MoveRow(row, dir);
         }
     }
 
     score += move_score;
-    can_move = move_score != 0;
-}
-
-auto Game::Spawn() -> bool
-{
-    return SpawnRandomTile();
 }
 
 auto Game::Score() const -> std::uint32_t
@@ -70,11 +60,11 @@ auto Game::BestScore() const -> std::uint32_t
     return best_score;
 }
 
-auto Game::CheckWin() -> bool
+auto Game::Win() -> bool
 {
-    for (size_t row = 0; row < rows; ++row)
+    for (size_t row = 0; row < grid.Rows(); ++row)
     {
-        for (size_t col = 0; col < cols; ++col)
+        for (size_t col = 0; col < grid.Cols(); ++col)
         {
             if (grid.GetTile(row, col).value == 2048)
             {
@@ -86,6 +76,33 @@ auto Game::CheckWin() -> bool
     return false;
 }
 
+auto Game::Lose() -> bool
+{
+    for (size_t row = 0; row < grid.Rows(); ++row)
+    {
+        for (size_t col = 0; col < grid.Cols(); ++col)
+        {
+            const Tile &tile = grid.GetTile(row, col);
+
+            // there are still moves available
+            if (tile.value == 0)
+            {
+                return false;
+            }
+
+            for (const Tile &neigh : grid.AdjacentTiles(row, col))
+            {
+                if (tile.value == neigh.value)
+                {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
 auto Game::MoveRow(const size_t row, const Direction dir) -> uint8_t
 {
     assert(dir == Direction::LEFT || dir == Direction::RIGHT);
@@ -93,8 +110,8 @@ auto Game::MoveRow(const size_t row, const Direction dir) -> uint8_t
     uint8_t score = 0;
 
     const bool is_right = dir == Direction::RIGHT;
-    const size_t start_col = is_right ? cols - 1 : 0;
-    const size_t end_col = is_right ? 0 : cols - 1;
+    const size_t start_col = is_right ? grid.Cols() - 1 : 0;
+    const size_t end_col = is_right ? 0 : grid.Cols() - 1;
     const int step = is_right ? -1 : 1;
 
     size_t write_pos = start_col; // Position to write the next non-zero or merged value
@@ -145,8 +162,8 @@ auto Game::MoveCol(const size_t col, const Direction dir) -> uint8_t
     uint8_t score = 0;
 
     const bool is_down = dir == Direction::DOWN;
-    const size_t start_row = is_down ? rows - 1 : 0;
-    const size_t end_row = is_down ? 0 : rows - 1;
+    const size_t start_row = is_down ? grid.Rows() - 1 : 0;
+    const size_t end_row = is_down ? 0 : grid.Rows() - 1;
     const int step = is_down ? -1 : 1;
 
     size_t write_pos = start_row; // Position to write the next non-zero or merged value
@@ -189,15 +206,15 @@ auto Game::MoveCol(const size_t col, const Direction dir) -> uint8_t
     return score;
 }
 
-auto Game::SpawnRandomTile() -> bool
+auto Game::Spawn() -> bool
 {
     // get empty tiles
     std::vector<std::pair<size_t, size_t>> empty_tiles;
-    empty_tiles.reserve(rows * cols - 1);
+    empty_tiles.reserve(grid.Rows() * grid.Cols() - 1);
 
-    for (int row = 0; row < rows; ++row)
+    for (int row = 0; row < grid.Rows(); ++row)
     {
-        for (int col = 0; col < cols; ++col)
+        for (int col = 0; col < grid.Cols(); ++col)
         {
             if (grid.IsEmpty(row, col))
             {
@@ -226,23 +243,4 @@ auto Game::SpawnRandomTile() -> bool
     grid.SetTile(rand_row, rand_col, val_dist(gen) == 0 ? 2 : 4);
 
     return true;
-}
-
-// TODO: check if there are tiles that can be merged
-bool Game::CanMove()
-{
-    // for (size_t row = 0; row < n_rows; ++row)
-    // {
-    //     // check cols
-    //     for (size_t col = 0; col < n_cols; ++col)
-    //     {
-    //     }
-    // }
-    //
-    // for (size_t col = 0; col < n_cols; ++col)
-    // {
-    //     // check rows
-    // }
-
-    return can_move;
 }

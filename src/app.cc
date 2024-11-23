@@ -91,18 +91,18 @@ void Application::CheckWin()
 {
     game.Spawn();
 
-    // if (!game.CanMove())
-    // {
-    //     std::cout << "Game Over\n";
-    //     // TODO: display game over screen
-    //     // TODO: reset game
-    //     SDL_Delay(3000);
-    //     game.Reset();
-    // }
-
-    if (game.CheckWin())
+    if (game.Lose())
     {
-        // WIN
+        std::cout << "Game Over\n";
+        // TODO: display game over screen
+        // TODO: reset game
+        // SDL_Delay(3000);
+        // game.Reset();
+    }
+
+    if (game.Win())
+    {
+        std::cout << "Win\n";
     }
 }
 
@@ -159,7 +159,8 @@ void Application::OnRender()
 
     // score
     constexpr SDL_FRect score_rect = {WindowStyle::WIDTH / 2.0f, 20, 48, 16};
-    DrawText(std::to_string(game.Score()).c_str(), score_rect, TileStyle(GridStyle::BG_COLOR, SDL_Color{0, 0, 0, 0}));
+    DrawText(std::to_string(game.Score()).c_str(), score_rect, TileStyle(GridStyle::BG_COLOR, SDL_Color{0, 0, 0, 0}),
+             32);
 
     // grid
     constexpr SDL_FRect rect = GetGridBackgroundRect();
@@ -169,6 +170,7 @@ void Application::OnRender()
     // draw grid
     DrawGrid(game.GetGrid());
 
+    // display
     SDL_RenderPresent(renderer);
 }
 
@@ -198,12 +200,14 @@ void Application::DrawTile(const Tile &tile, const SDL_FRect &rect) const
     if (tile.value != 0)
     {
         const std::string str = std::to_string(tile.value);
-        DrawText(str.c_str(), rect, style);
+        DrawText(str.c_str(), rect, style, 50);
     }
 }
 
-void Application::DrawText(const char *text, const SDL_FRect &rect, const TileStyle &style) const
+void Application::DrawText(const char *text, const SDL_FRect &rect, const TileStyle &style, const float size = 50) const
 {
+    TTF_SetFontSize(font, size);
+
     SDL_Surface *surface = TTF_RenderText_LCD(font, text, 0, style.foreground, style.background);
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
 

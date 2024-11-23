@@ -26,7 +26,7 @@ class Application
     void OnEvent(const SDL_Event &event);
     void DrawGrid(const Grid &grid) const;
     void DrawTile(const Tile &tile, const SDL_FRect &rect) const;
-    void DrawText(const char *text, const SDL_FRect &rect, const TileStyle &style) const;
+    void DrawText(const char *text, const SDL_FRect &rect, const TileStyle &style, float size) const;
 };
 
 constexpr auto GetGridBackgroundRect() -> SDL_FRect;

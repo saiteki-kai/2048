@@ -3,6 +3,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <vector>
 
 struct Tile
 {
@@ -25,6 +26,7 @@ class Grid
     [[nodiscard]] auto Rows() const -> size_t;
     [[nodiscard]] auto Cols() const -> size_t;
     [[nodiscard]] auto GetTile(size_t row, size_t col) const -> const Tile &;
+    [[nodiscard]] auto AdjacentTiles(size_t row, size_t col) const -> std::vector<Tile>;
     void Init();
     auto IsEmpty(size_t row, size_t col) -> bool;
     void SetTile(const Tile &tile, int value);
