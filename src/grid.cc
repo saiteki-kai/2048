@@ -62,13 +62,14 @@ auto Grid::AdjacentTiles(size_t row, size_t col) const -> std::vector<Tile>
         throw std::out_of_range(msg);
     }
 
-    std::vector<Tile> neighbours(4);
+    std::vector<Tile> neighbours;
+    neighbours.reserve(4);
 
     for (const auto &[row_off, col_off] : std::vector<std::pair<int, int>>{{0, 1}, {0, -1}, {1, 0}, {-1, 0}})
     {
         if (IsValidPosition(row + row_off, col + col_off))
         {
-            neighbours.push_back(GetTile(row + row_off, col + col_off));
+            neighbours.emplace_back(GetTile(row + row_off, col + col_off));
         }
     }
 

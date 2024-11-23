@@ -1,6 +1,8 @@
 include(CTest)
 enable_testing()
 
+set(CMAKE_CXX_FLAGS "--coverage")
+
 include(FetchContent)
 FetchContent_Declare(
         googletest
@@ -12,7 +14,7 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-add_executable(2048_test game_test.cc)
+add_executable(2048_test game_test.cc grid_test.cc)
 target_link_libraries(2048_test GTest::gtest_main Game)
 
 include(GoogleTest)
