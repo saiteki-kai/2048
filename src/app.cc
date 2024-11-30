@@ -1,7 +1,5 @@
 #include "app.h"
-
 #include "game_renderer.h"
-#include "style.h"
 
 #include <cmath>
 #include <iostream>
@@ -10,7 +8,7 @@ Application::Application()
 {
     SDL_Init(SDL_INIT_VIDEO);
 
-    if (!SDL_CreateWindowAndRenderer("2048", layout.width, layout.height, 0, &window, &renderer))
+    if (!SDL_CreateWindowAndRenderer("2048", app_layout.width, app_layout.height, 0, &window, &renderer))
     {
         throw std::runtime_error(SDL_GetError());
     }
@@ -21,7 +19,7 @@ Application::Application()
     }
 
     const auto font_path = std::string(USER_FONT_PATH);
-    font = TTF_OpenFont(font_path.c_str(), WindowStyle::FONT_SIZE);
+    font = TTF_OpenFont(font_path.c_str(), 50);
 
     if (!font)
     {
@@ -123,10 +121,10 @@ void Application::OnRender()
 {
     SDL_RenderClear(renderer);
 
-    const auto game_renderer = GameRenderer(renderer, font);                        // Refactor: init in the constructor
-    game_renderer.DrawBackground(GridStyle::BG_COLOR);
-    game_renderer.DrawScoreBoard(game.Score(), game.BestScore(), layout.score_rect);
-    game_renderer.DrawGrid(game.GetGrid(), layout.grid_rect);
+    const auto game_renderer = GameRenderer(renderer, font); // Refactor: init in the constructor
+    game_renderer.DrawBackground(app_layout.grid_layout.bg_color);
+    game_renderer.DrawScoreBoard(game.Score(), game.BestScore(), app_layout.score_board_layout);
+    game_renderer.DrawGrid(game.GetGrid(), app_layout.grid_layout);
 
     // display
     SDL_RenderPresent(renderer);

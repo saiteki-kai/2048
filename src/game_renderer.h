@@ -1,6 +1,7 @@
 #pragma once
 
 #include "game.h"
+#include "layout.h"
 #include "utils.h"
 
 #include <SDL3/SDL.h>
@@ -44,6 +45,6 @@ class GameRenderer
   public:
     GameRenderer(SDL_Renderer *renderer, TTF_Font *font);
     void DrawBackground(const SDL_Color &color) const;
-    void DrawGrid(const Grid &grid, const SDL_FRect &grid_rect) const;
-    void DrawScoreBoard(uint32_t score, uint32_t best, const SDL_FRect &scores_rect) const;
+    void DrawGrid(const Grid &grid, const GridLayout &layout) const;
+    void DrawScoreBoard(uint32_t score, uint32_t best, const ScoreBoardLayout &layout) const;
 };
