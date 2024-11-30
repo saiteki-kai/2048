@@ -48,7 +48,7 @@ Run the game:
 
 ## Next Steps
 
-- [ ] Style / layout refactoring
+- [x] Style / layout refactoring
 - [ ] Game states for game over, win, start showing keyboard instruction
 - [ ] Adaptable font size
 - [ ] Game tests
