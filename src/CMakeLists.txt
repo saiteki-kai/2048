@@ -1,7 +1,7 @@
 # Libraries
 
-add_library(Game grid.cc game.cc grid.h game.h)
-add_library(App app.cc app.h style.h)
+add_library(Game grid.cc grid.h game.cc game.h)
+add_library(App app.cc app.h style.h game_renderer.cc game_renderer.h)
 target_link_libraries(App Game)
 
 # External libraries
