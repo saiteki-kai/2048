@@ -50,7 +50,7 @@ Run the game:
 
 - [x] Style / layout refactoring
 - [ ] Game states for game over, win, start showing keyboard instruction
-- [ ] Adaptable font size
+- [x] Adaptable font size
 - [ ] Game tests
 - [ ] Improve memory usage
 - [ ] Rounded borders
