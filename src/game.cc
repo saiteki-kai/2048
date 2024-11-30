@@ -18,10 +18,7 @@ void Game::Start()
 
 void Game::Reset()
 {
-    if (score > best_score)
-    {
-        best_score = score;
-    }
+    best_score = BestScore();
     score = 0;
     can_move = true;
 
@@ -57,6 +54,11 @@ auto Game::Score() const -> std::uint32_t
 
 auto Game::BestScore() const -> std::uint32_t
 {
+    if (score > best_score)
+    {
+        return score;
+    }
+
     return best_score;
 }
 
