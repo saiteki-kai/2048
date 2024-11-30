@@ -5,9 +5,15 @@
 #include <cmath>
 #include <utility>
 
-ScoreBox::ScoreBox(const SDL_Color bg_color, const SDL_Color text_color, const SDL_FRect &rect, const uint32_t value,
-                   std::string label)
-    : bg_color(bg_color), text_color(text_color), rect(rect), value(value), label(std::move(label))
+ScoreBox::ScoreBox(const SDL_Color bg_color, const SDL_Color text_color, const uint32_t value, std::string label)
+    : bg_color(bg_color), text_color(text_color), value(value), label(std::move(label))
+{
+}
+
+TextBox::TextBox(const SDL_Color bg_color, const SDL_Color text_color, const TextAlignment alignment, std::string label,
+                 const float size, const float padding)
+    : bg_color(bg_color), text_color(text_color), alignment(alignment), text(std::move(label)), size(size),
+      padding(padding)
 {
 }
 
@@ -16,18 +22,17 @@ void GameRenderer::SetRenderColor(const SDL_Color &color) const
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 }
 
-void GameRenderer::DrawText(const char *text, const SDL_FRect &rect, const TileStyle &style, const float size,
-                        const TextAlignment alignment, const float padding) const
+void GameRenderer::DrawText(const TextBox &text_box, const SDL_FRect &rect) const
 {
     auto [x, y, w, h] = rect;
-    x = rect.x + padding;
-    y = rect.y + padding;
-    w = rect.w - 2 * padding;
-    h = rect.h - 2 * padding;
+    x = rect.x + text_box.padding;
+    y = rect.y + text_box.padding;
+    w = rect.w - 2 * text_box.padding;
+    h = rect.h - 2 * text_box.padding;
 
-    TTF_SetFontSize(font, size); // adapt the font size to use the padded area
+    TTF_SetFontSize(font, text_box.size); // adapt the font size to use the padded area
 
-    SDL_Surface *surface = TTF_RenderText_LCD(font, text, 0, style.foreground, style.background);
+    SDL_Surface *surface = TTF_RenderText_LCD(font, text_box.text.c_str(), 0, text_box.bg_color, text_box.text_color);
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
 
     const auto text_width = static_cast<float>(surface->w);
@@ -35,7 +40,7 @@ void GameRenderer::DrawText(const char *text, const SDL_FRect &rect, const TileS
 
     SDL_FRect textRect;
 
-    switch (alignment)
+    switch (text_box.alignment)
     {
     case TextAlignment::Left:
         textRect.x = x;
@@ -64,9 +69,11 @@ void GameRenderer::DrawScoreBox(const ScoreBox &box, const SDL_FRect &rect) cons
     SetRenderColor(box.bg_color);
     SDL_RenderFillRect(renderer, &rect);
 
-    const auto style = TileStyle(box.bg_color, box.text_color);
-    DrawText(box.label.c_str(), rect, style, 16, TextAlignment::Left, 10);
-    DrawText(std::to_string(box.value).c_str(), rect, style, 21, TextAlignment::Right, 10);
+    const auto label = TextBox(box.text_color, box.bg_color, TextAlignment::Left, box.label, 16, 10);
+    const auto value = TextBox(box.text_color, box.bg_color, TextAlignment::Right, std::to_string(box.value), 21, 10);
+
+    DrawText(label, rect);
+    DrawText(value, rect);
 }
 
 GameRenderer::GameRenderer(SDL_Renderer *renderer, TTF_Font *font) : renderer(renderer), font(font)
@@ -97,7 +104,8 @@ void GameRenderer::DrawTile(const Tile &tile, const SDL_FRect &rect) const
     if (tile.value != 0)
     {
         const std::string str = std::to_string(tile.value);
-        DrawText(str.c_str(), rect, style, 50, TextAlignment::Center, 5);
+        const auto textbox = TextBox(style.foreground, style.background, TextAlignment::Center, str, 50, 5);
+        DrawText(textbox, rect);
     }
 }
 
@@ -133,8 +141,8 @@ void GameRenderer::DrawScoreBoard(const SDL_FRect &scores_rect, const uint32_t s
     const SDL_FRect score_rect = {scores_rect.x, scores_rect.y, box_width, box_height};
     const SDL_FRect best_rect = {scores_rect.x + box_width + middle_gap, scores_rect.y, box_width, box_height};
 
-    const auto scoreBox = ScoreBox(bg_color, text_color, score_rect, score, "Score");
-    const auto bestBox = ScoreBox(bg_color, text_color, best_rect, best, "Best");
+    const auto scoreBox = ScoreBox(bg_color, text_color, score, "Score");
+    const auto bestBox = ScoreBox(bg_color, text_color, best, "Best");
 
     DrawScoreBox(scoreBox, score_rect);
     DrawScoreBox(bestBox, best_rect);

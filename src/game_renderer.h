@@ -1,7 +1,6 @@
 #pragma once
 
 #include "game.h"
-#include "style.h"
 
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
@@ -18,11 +17,23 @@ struct ScoreBox
 {
     SDL_Color bg_color;
     SDL_Color text_color;
-    SDL_FRect rect;
     uint32_t value;
     std::string label;
 
-    ScoreBox(SDL_Color bg_color, SDL_Color text_color, const SDL_FRect &rect, uint32_t value, std::string label);
+    ScoreBox(SDL_Color bg_color, SDL_Color text_color, uint32_t value, std::string label);
+};
+
+struct TextBox
+{
+    SDL_Color bg_color;
+    SDL_Color text_color;
+    TextAlignment alignment;
+    std::string text;
+    float size;
+    float padding;
+
+    TextBox(SDL_Color bg_color, SDL_Color text_color, TextAlignment alignment, std::string label, float size,
+            float padding);
 };
 
 class GameRenderer
@@ -34,8 +45,7 @@ class GameRenderer
   private:
     void SetRenderColor(const SDL_Color &color) const;
     void DrawTile(const Tile &tile, const SDL_FRect &rect) const;
-    void DrawText(const char *text, const SDL_FRect &rect, const TileStyle &style, float size, TextAlignment alignment,
-                  float padding) const;
+    void DrawText(const TextBox &text_box, const SDL_FRect &rect) const;
     void DrawScoreBox(const ScoreBox &box, const SDL_FRect &rect) const;
 
   public:
