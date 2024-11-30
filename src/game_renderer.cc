@@ -16,10 +16,16 @@ void GameRenderer::DrawText(const TextBox &text_box, const SDL_FRect &rect, cons
     w = rect.w - 2 * text_box.padding;
     h = rect.h - 2 * text_box.padding;
 
-    TTF_SetFontSize(font, text_box.size); // adapt the font size to use the padded area
-
+    TTF_SetFontSize(font, text_box.size);
     SDL_Surface *surface = TTF_RenderText_LCD(font, text_box.text.c_str(), 0, text_box.color, background);
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+
+    if (text_box.fit_container)
+    {
+        const auto font_size = AdjustFontSizeToFitRect(surface, font, text_box.text, text_box.size, h, w);
+
+        TTF_SetFontSize(font, font_size);
+        surface = TTF_RenderText_LCD(font, text_box.text.c_str(), 0, text_box.color, background);
+    }
 
     const auto text_width = static_cast<float>(surface->w);
     const auto text_height = static_cast<float>(surface->h);
@@ -27,6 +33,7 @@ void GameRenderer::DrawText(const TextBox &text_box, const SDL_FRect &rect, cons
     SDL_FRect text_rect = {x, y, w, h};
     AlignTextRect(text_rect, text_height, text_width, text_box.alignment);
 
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_RenderTexture(renderer, texture, nullptr, &text_rect);
 
     SDL_DestroySurface(surface);
@@ -51,7 +58,7 @@ void GameRenderer::DrawTile(const Tile &tile, const SDL_FRect &rect) const
     // tile text
     if (tile.value != 0)
     {
-        const auto textbox = TextBox(std::to_string(tile.value), 50, 5, foreground, TextAlignment::Center);
+        const auto textbox = TextBox(std::to_string(tile.value), 50, 20, foreground, TextAlignment::Center, true);
         DrawText(textbox, rect, background);
     }
 }
@@ -73,11 +80,11 @@ void GameRenderer::DrawGrid(const Grid &grid, const GridLayout &layout) const
 
 void GameRenderer::DrawScoreBoard(const uint32_t score, const uint32_t best, const ScoreBoardLayout &layout) const
 {
-    auto score_label = TextBox("Score", 16, 10, layout.score_fg_color, TextAlignment::Left);
-    auto score_value = TextBox(std::to_string(score), 21, 10, layout.score_fg_color, TextAlignment::Right);
+    auto score_label = TextBox("Score", 16, 10, layout.score_fg_color, TextAlignment::Left, false);
+    auto score_value = TextBox(std::to_string(score), 21, 10, layout.score_fg_color, TextAlignment::Right, false);
 
-    auto best_label = TextBox("Best", 16, 10, layout.best_fg_color, TextAlignment::Left);
-    auto best_value = TextBox(std::to_string(best), 21, 10, layout.best_fg_color, TextAlignment::Right);
+    auto best_label = TextBox("Best", 16, 10, layout.best_fg_color, TextAlignment::Left, false);
+    auto best_value = TextBox(std::to_string(best), 21, 10, layout.best_fg_color, TextAlignment::Right, false);
 
     const auto score_box = ScoreBox(score_label, score_value, layout.score_bg_color);
     const auto best_box = ScoreBox(best_label, best_value, layout.best_bg_color);

@@ -1,7 +1,5 @@
 #include "utils.h"
 
-#include <SDL3/SDL_render.h>
-
 void SetRenderColor(SDL_Renderer *renderer, const SDL_Color &color)
 {
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
@@ -30,4 +28,29 @@ void AlignTextRect(SDL_FRect &rect, const float text_height, const float text_wi
     rect.y = rect.y + (rect.h - text_height) / 2;
     rect.h = text_height;
     rect.w = text_width;
+}
+
+auto AdjustFontSizeToFitRect(SDL_Surface *surface, TTF_Font *font, const std::string_view text, const float size,
+                             const float height, const float width) -> float
+{
+    float font_size = size;
+
+    while (true)
+    {
+        if (surface)
+        {
+            const auto text_width = static_cast<float>(surface->w);
+            const auto text_height = static_cast<float>(surface->h);
+
+            SDL_DestroySurface(surface);
+
+            if (text_width <= width && text_height <= height)
+            {
+                return font_size;
+            }
+        }
+
+        TTF_SetFontSize(font, --font_size);
+        surface = TTF_RenderText_Solid(font, text.data(), 0, {});
+    }
 }

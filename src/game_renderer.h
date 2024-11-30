@@ -15,10 +15,11 @@ struct TextBox
     float padding;
     SDL_Color color;
     TextAlignment alignment;
+    bool fit_container = false;
 
     TextBox(const std::string_view text, const float size, const float padding, const SDL_Color color,
-            const TextAlignment alignment)
-        : text(text), size(size), padding(padding), color(color), alignment(alignment) {};
+            const TextAlignment alignment, const bool fit_container)
+        : text(text), size(size), padding(padding), color(color), alignment(alignment), fit_container(fit_container) {};
 };
 
 struct ScoreBox
