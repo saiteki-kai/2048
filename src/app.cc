@@ -125,7 +125,7 @@ void Application::OnRender()
 
     const auto game_renderer = GameRenderer(renderer, font);                        // Refactor: init in the constructor
     game_renderer.DrawBackground(GridStyle::BG_COLOR);
-    game_renderer.DrawScoreBoard(layout.score_rect, game.Score(), game.BestScore());
+    game_renderer.DrawScoreBoard(game.Score(), game.BestScore(), layout.score_rect);
     game_renderer.DrawGrid(game.GetGrid(), layout.grid_rect);
 
     // display
