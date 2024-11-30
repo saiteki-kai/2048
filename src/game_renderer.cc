@@ -1,24 +1,10 @@
 #include "game_renderer.h"
-
 #include "style.h"
 
 #include <cmath>
-#include <utility>
 
-TextBox::TextBox(const std::string_view text, const float size, const float padding, const SDL_Color color,
-                 const TextAlignment alignment)
-    : text(text), size(size), padding(padding), color(color), alignment(alignment)
+GameRenderer::GameRenderer(SDL_Renderer *renderer, TTF_Font *font) : renderer(renderer), font(font)
 {
-}
-
-ScoreBox::ScoreBox(TextBox &label_text, TextBox &score_text, const SDL_Color &color)
-    : label_text(label_text), score_text(score_text), bg_color(color)
-{
-}
-
-void GameRenderer::SetRenderColor(const SDL_Color &color) const
-{
-    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 }
 
 void GameRenderer::DrawText(const TextBox &text_box, const SDL_FRect &rect, const SDL_Color &background) const
@@ -37,27 +23,10 @@ void GameRenderer::DrawText(const TextBox &text_box, const SDL_FRect &rect, cons
     const auto text_width = static_cast<float>(surface->w);
     const auto text_height = static_cast<float>(surface->h);
 
-    SDL_FRect textRect;
+    SDL_FRect text_rect = {x, y, w, h};
+    AlignTextRect(text_rect, text_height, text_width, text_box.alignment);
 
-    switch (text_box.alignment)
-    {
-    case TextAlignment::Left:
-        textRect.x = x;
-        break;
-    case TextAlignment::Right:
-        textRect.x = x + w - text_width;
-        break;
-    case TextAlignment::Center:
-    default:
-        textRect.x = x + (w - text_width) / 2;
-        break;
-    }
-
-    textRect.y = y + (h - text_height) / 2;
-    textRect.w = text_width;
-    textRect.h = text_height;
-
-    SDL_RenderTexture(renderer, texture, nullptr, &textRect);
+    SDL_RenderTexture(renderer, texture, nullptr, &text_rect);
 
     SDL_DestroySurface(surface);
     SDL_DestroyTexture(texture);
@@ -65,22 +34,19 @@ void GameRenderer::DrawText(const TextBox &text_box, const SDL_FRect &rect, cons
 
 void GameRenderer::DrawScoreBox(const ScoreBox &box, const SDL_FRect &rect) const
 {
-    SetRenderColor(box.bg_color);
-    SDL_RenderFillRect(renderer, &rect);
-
+    FillRect(renderer, &rect, box.bg_color);
     DrawText(box.label_text, rect, box.bg_color);
     DrawText(box.score_text, rect, box.bg_color);
 }
 
-GameRenderer::GameRenderer(SDL_Renderer *renderer, TTF_Font *font) : renderer(renderer), font(font)
-{
-}
-
 constexpr auto GetGridTileRect(const size_t row, const size_t col, const SDL_FRect &grid_rect) -> SDL_FRect
 {
+    const auto i = static_cast<float>(col);
+    const auto j = static_cast<float>(row);
+
     SDL_FRect rect;
-    rect.x = grid_rect.x + static_cast<float>(col) * GridStyle::TILE_SIZE + (col + 1) * GridStyle::TILE_GAP;
-    rect.y = grid_rect.y + static_cast<float>(row) * GridStyle::TILE_SIZE + (row + 1) * GridStyle::TILE_GAP;
+    rect.x = grid_rect.x + i * GridStyle::TILE_SIZE + (i + 1) * GridStyle::TILE_GAP;
+    rect.y = grid_rect.y + j * GridStyle::TILE_SIZE + (j + 1) * GridStyle::TILE_GAP;
     rect.w = GridStyle::TILE_SIZE;
     rect.h = GridStyle::TILE_SIZE;
 
@@ -93,8 +59,7 @@ void GameRenderer::DrawTile(const Tile &tile, const SDL_FRect &rect) const
     const TileStyle &style = tile_colors.at(idx);
 
     // tile background
-    SetRenderColor(style.background);
-    SDL_RenderFillRect(renderer, &rect);
+    FillRect(renderer, &rect, style.background);
 
     // tile text
     if (tile.value != 0)
@@ -107,8 +72,7 @@ void GameRenderer::DrawTile(const Tile &tile, const SDL_FRect &rect) const
 void GameRenderer::DrawGrid(const Grid &grid, const SDL_FRect &grid_rect) const
 {
     // grid background
-    SetRenderColor(GridStyle::FG_COLOR);
-    SDL_RenderFillRect(renderer, &grid_rect);
+    FillRect(renderer, &grid_rect, GridStyle::FG_COLOR);
 
     for (int row = 0; row < grid.Rows(); ++row)
     {
@@ -148,6 +112,5 @@ void GameRenderer::DrawScoreBoard(const uint32_t score, const uint32_t best, con
 
 void GameRenderer::DrawBackground(const SDL_Color &color) const
 {
-    SetRenderColor(color);
-    SDL_RenderFillRect(renderer, nullptr);
+    FillRect(renderer, nullptr, color);
 }

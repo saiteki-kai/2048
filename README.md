@@ -1,6 +1,7 @@
 # 2048 C++ Clone
 
-This is a C++ clone of the popular game [2048](https://play2048.co/), created by [Gabriele Cirulli](https://github.com/gabrielecirulli).
+This is a C++ clone of the popular game [2048](https://play2048.co/), created
+by [Gabriele Cirulli](https://github.com/gabrielecirulli).
 The game is built using the SDL3 and SDL3_ttf libraries.
 
 ## About
@@ -44,3 +45,13 @@ Run the game:
 ```bash
 ./2048
 ```
+
+## Next Steps
+
+- [ ] Style / layout refactoring
+- [ ] Game states for game over, win, start showing keyboard instruction
+- [ ] Adaptable font size
+- [ ] Game tests
+- [ ] Improve memory usage
+- [ ] Rounded borders
+- [ ] Animations
