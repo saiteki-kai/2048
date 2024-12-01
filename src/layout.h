@@ -10,10 +10,10 @@ struct MessageLayout
 
     SDL_FRect rect;
 
-    float title_size = 60;
-    float subtitle_size = 35;
-    float text_height = 50;
-    float vertical_gap = 60;
+    float offset_y = 35;
+    float title_size = 65;
+    float subtitle_size = 45;
+    float vertical_gap = 40;
 
     explicit MessageLayout(const SDL_FRect &rect) : rect(rect)
     {

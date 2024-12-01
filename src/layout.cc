@@ -2,7 +2,7 @@
 
 auto MessageLayout::TotalSize() const -> float
 {
-    return text_height * 2 + vertical_gap;
+    return title_size + subtitle_size + vertical_gap;
 }
 
 auto MessageLayout::TitleRect() const -> SDL_FRect
@@ -11,8 +11,8 @@ auto MessageLayout::TitleRect() const -> SDL_FRect
 
     SDL_FRect title_rect;
     title_rect.x = rect.x;
-    title_rect.y = rect.y + (rect.h - total_height) / 2 - text_height;
-    title_rect.h = text_height;
+    title_rect.y = rect.y + (rect.h - total_height) / 2 - title_size + offset_y;
+    title_rect.h = title_size;
     title_rect.w = rect.w;
 
     return title_rect;
@@ -22,8 +22,8 @@ auto MessageLayout::SubtitleRect() const -> SDL_FRect
 {
     SDL_FRect subtitle_rect;
     subtitle_rect.x = rect.x;
-    subtitle_rect.y = rect.y + TotalSize() + text_height + vertical_gap;
-    subtitle_rect.h = text_height;
+    subtitle_rect.y = rect.y + TotalSize() + title_size + vertical_gap + offset_y;
+    subtitle_rect.h = subtitle_size;
     subtitle_rect.w = rect.w;
 
     return subtitle_rect;
