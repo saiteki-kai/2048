@@ -11,9 +11,15 @@ struct MessageLayout
     SDL_FRect rect;
 
     float offset_y = 35;
-    float title_size = 65;
-    float subtitle_size = 45;
+    float title_font_size = 65;
+    float subtitle_font_size = 45;
     float vertical_gap = 40;
+
+    float init_title_padding_x = 40;
+    float init_subtitle_padding_x = 20;
+    float end_title_padding_x = 20;
+    float end_subtitle_padding_x = 10;
+    float padding_y = 0;
 
     explicit MessageLayout(const SDL_FRect &rect) : rect(rect)
     {
@@ -37,6 +43,14 @@ struct ScoreBoardLayout
     float box_height = 50;
     float box_width = 0;
 
+    float label_font_size = 16;
+    float label_padding_x = 10;
+    float label_padding_y = 10;
+
+    float value_font_size = 21;
+    float value_padding_x = 10;
+    float value_padding_y = 10;
+
     explicit ScoreBoardLayout(const SDL_FRect &score_board_rect)
         : rect(score_board_rect), box_width((rect.w - middle_gap) / 2.0f)
     {
@@ -55,6 +69,18 @@ struct TileStyle
     static constexpr SDL_Color LightText = {0xff, 0xff, 0xff, 0xff};
 };
 
+struct TileLayout
+{
+    SDL_FRect rect;
+
+    float font_size = 50;
+    float padding = 20;
+
+    explicit TileLayout(const SDL_FRect &rect) : rect(rect)
+    {
+    }
+};
+
 struct GridLayout
 {
     SDL_Color bg_color = {0xfa, 0xf8, 0xef, 0xff};
@@ -70,7 +96,7 @@ struct GridLayout
     {
     }
 
-    [[nodiscard]] auto TileRect(size_t row, size_t col) const -> SDL_FRect;
+    [[nodiscard]] auto GetTileLayout(size_t row, size_t col) const -> TileLayout;
 };
 
 static constexpr std::array tile_colors = {

@@ -46,19 +46,20 @@ void GameRenderer::DrawScoreBox(const ScoreBox &box, const SDL_FRect &rect) cons
     DrawText(box.score_text, rect);
 }
 
-void GameRenderer::DrawTile(const Tile &tile, const SDL_FRect &rect) const
+void GameRenderer::DrawTile(const Tile &tile, const TileLayout &layout) const
 {
     const auto idx = static_cast<size_t>(tile.value == 0 ? 0 : std::log2(tile.value));
     const auto &[background, foreground] = tile_colors.at(idx);
 
     // tile background
-    FillRect(renderer, &rect, background);
+    FillRect(renderer, &layout.rect, background);
 
     // tile text
     if (tile.value != 0)
     {
-        const auto textbox = TextBox(std::to_string(tile.value), 50, 20, 20, foreground, TextAlignment::Center, true);
-        DrawText(textbox, rect);
+        const auto textbox = TextBox(std::to_string(tile.value), layout.font_size, layout.padding, layout.padding,
+                                     foreground, TextAlignment::Center, true);
+        DrawText(textbox, layout.rect);
     }
 }
 
@@ -72,18 +73,22 @@ void GameRenderer::DrawGrid(const Grid &grid, const GridLayout &layout) const
         for (int col = 0; col < grid.Cols(); ++col)
         {
             const Tile &tile = grid.GetTile(row, col);
-            DrawTile(tile, layout.TileRect(row, col));
+            DrawTile(tile, layout.GetTileLayout(row, col));
         }
     }
 }
 
 void GameRenderer::DrawScoreBoard(const uint32_t score, const uint32_t best, const ScoreBoardLayout &layout) const
 {
-    auto score_label = TextBox("Score", 16, 10, 10, layout.score_fg_color, TextAlignment::Left, true);
-    auto score_value = TextBox(std::to_string(score), 21, 10, 10, layout.score_fg_color, TextAlignment::Right, true);
+    auto score_label = TextBox("Score", layout.label_font_size, layout.label_padding_x, layout.label_padding_y,
+                               layout.score_fg_color, TextAlignment::Left, true);
+    auto score_value = TextBox(std::to_string(score), layout.value_font_size, layout.value_padding_x,
+                               layout.value_padding_y, layout.score_fg_color, TextAlignment::Right, true);
 
-    auto best_label = TextBox("Best", 16, 10, 10, layout.best_fg_color, TextAlignment::Left, true);
-    auto best_value = TextBox(std::to_string(best), 21, 10, 10, layout.best_fg_color, TextAlignment::Right, true);
+    auto best_label = TextBox("Best", layout.label_font_size, layout.label_padding_x, layout.label_padding_y,
+                              layout.best_fg_color, TextAlignment::Left, true);
+    auto best_value = TextBox(std::to_string(best), layout.value_font_size, layout.value_padding_x,
+                              layout.value_padding_y, layout.best_fg_color, TextAlignment::Right, true);
 
     const auto score_box = ScoreBox(score_label, score_value, layout.score_bg_color);
     const auto best_box = ScoreBox(best_label, best_value, layout.best_bg_color);
@@ -104,11 +109,12 @@ void GameRenderer::DrawInitScreen(const MessageLayout &layout) const
     constexpr std::string_view title = "Press any key to start";
     constexpr std::string_view subtitle = "use WASD or arrow keys to move tiles";
 
-    const auto title_box = TextBox(title, layout.title_size, 40, 0, layout.fg_color, TextAlignment::Center, true);
-    DrawText(title_box, layout.TitleRect());
+    const auto title_box = TextBox(title, layout.title_font_size, layout.init_title_padding_x, layout.padding_y,
+                                   layout.fg_color, TextAlignment::Center, true);
+    const auto subtitle_box = TextBox(subtitle, layout.subtitle_font_size, layout.init_subtitle_padding_x,
+                                      layout.padding_y, layout.fg_color, TextAlignment::Center, true);
 
-    const auto subtitle_box =
-        TextBox(subtitle, layout.subtitle_size, 20, 0, layout.fg_color, TextAlignment::Center, true);
+    DrawText(title_box, layout.TitleRect());
     DrawText(subtitle_box, layout.SubtitleRect());
 }
 
@@ -130,10 +136,11 @@ void GameRenderer::DrawEndGameMessage(const MessageLayout &layout, const GameSta
         subtitle = "Press 'R' to play again";
     }
 
-    const auto title_box = TextBox(title, layout.title_size, 20, 0, layout.fg_color, TextAlignment::Center, true);
-    DrawText(title_box, layout.TitleRect());
+    const auto title_box = TextBox(title, layout.title_font_size, layout.end_title_padding_x, layout.padding_y,
+                                   layout.fg_color, TextAlignment::Center, true);
+    const auto subtitle_box = TextBox(subtitle, layout.subtitle_font_size, layout.end_subtitle_padding_x,
+                                      layout.padding_y, layout.fg_color, TextAlignment::Center, true);
 
-    const auto subtitle_box =
-        TextBox(subtitle, layout.subtitle_size, 10, 0, layout.fg_color, TextAlignment::Center, true);
+    DrawText(title_box, layout.TitleRect());
     DrawText(subtitle_box, layout.SubtitleRect());
 }

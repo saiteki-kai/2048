@@ -50,9 +50,9 @@ Run the game:
 
 - [x] Style / layout refactoring
 - [x] Game states for game over, win, start showing keyboard instruction
-- [ ] Move hardcoded variables to layouts
+- [x] Move hardcoded variables to layouts
 - [x] Adaptable font size
-- [ ] Improve UI
+- [x] Improve UI
 - [ ] Game tests
 - [ ] Improve memory usage (reallocations, rendering cache)
 - [ ] Rounded borders

@@ -4,6 +4,10 @@
 #include <iostream>
 #include <random>
 
+Game::Game() : gen(std::random_device()())
+{
+}
+
 auto Game::GetGrid() -> Grid &
 {
     return grid;
@@ -66,7 +70,7 @@ auto Game::CheckVictory() -> bool
     {
         for (size_t col = 0; col < grid.Cols(); ++col)
         {
-            if (grid.GetTile(row, col).value == 2048)
+            if (grid.GetTile(row, col).value == WIN_TILE)
             {
                 state = GameState::Victory;
                 return true;
@@ -241,9 +245,6 @@ auto Game::Spawn() -> bool
     {
         return false;
     }
-
-    std::random_device rd;
-    std::mt19937 gen(rd());
 
     std::uniform_int_distribution<size_t> index_dist(0, empty_tiles.size() - 1);
 

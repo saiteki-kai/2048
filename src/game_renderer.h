@@ -41,7 +41,7 @@ class GameRenderer
     TTF_Font *font = nullptr;
 
   private:
-    void DrawTile(const Tile &tile, const SDL_FRect &rect) const;
+    void DrawTile(const Tile &tile, const TileLayout &layout) const;
     void DrawText(const TextBox &text_box, const SDL_FRect &rect) const;
     void DrawScoreBox(const ScoreBox &box, const SDL_FRect &rect) const;
 
