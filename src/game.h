@@ -13,24 +13,36 @@ enum class Direction : std::int8_t
     RIGHT
 };
 
-class Game
+enum class GameState : uint8_t
+{
+    Startup,
+    GameOver,
+    Playing,
+    Victory,
+};
+
+struct Game
 {
   private:
     Grid grid;
-    bool can_move = true;
     std::uint32_t score = 0;
     std::uint32_t best_score = 0;
+    GameState state = GameState::Startup;
+
+  private:
+    auto Spawn() -> bool;
+    auto CheckVictory() -> bool;
+    auto CheckGameOver() -> bool;
+    auto MoveRow(size_t row, Direction dir) -> uint8_t;
+    auto MoveCol(size_t col, Direction dir) -> uint8_t;
 
   public:
     auto GetGrid() -> Grid &;
     void Start();
     void Reset();
-    auto Spawn() -> bool;
     void Move(Direction dir);
-    auto Win() -> bool;
-    auto Lose() -> bool;
+    auto Update() -> bool;
     [[nodiscard]] auto Score() const -> std::uint32_t;
     [[nodiscard]] auto BestScore() const -> std::uint32_t;
-    auto MoveRow(size_t row, Direction dir) -> uint8_t;
-    auto MoveCol(size_t col, Direction dir) -> uint8_t;
+    [[nodiscard]] auto State() const -> GameState;
 };

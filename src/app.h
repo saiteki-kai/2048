@@ -8,14 +8,6 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #include <memory>
 
-enum class GameState : uint8_t
-{
-    Startup,
-    GameOver,
-    Playing,
-    Victory,
-};
-
 struct Application
 {
   private:
@@ -25,7 +17,6 @@ struct Application
     SDL_Renderer *renderer = nullptr;
     ApplicationLayout app_layout;
     std::unique_ptr<GameRenderer> game_renderer;
-    GameState state = GameState::Startup;
     bool running = false;
 
   private:
@@ -33,7 +24,6 @@ struct Application
     void Quit() const;
     void PoolEvents(SDL_Event &event);
     auto HandleKeyDownEvent(const SDL_Event &event) -> bool;
-    void CheckGameState();
     void Render();
 
   public:

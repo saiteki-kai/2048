@@ -9,8 +9,14 @@ auto Game::GetGrid() -> Grid &
     return grid;
 }
 
+auto Game::State() const -> GameState
+{
+    return state;
+}
+
 void Game::Start()
 {
+    state = GameState::Playing;
     grid.Init();
     Spawn();
     Spawn();
@@ -18,10 +24,7 @@ void Game::Start()
 
 void Game::Reset()
 {
-    best_score = BestScore();
     score = 0;
-    can_move = true;
-
     Start();
 }
 
@@ -54,15 +57,10 @@ auto Game::Score() const -> std::uint32_t
 
 auto Game::BestScore() const -> std::uint32_t
 {
-    if (score > best_score)
-    {
-        return score;
-    }
-
     return best_score;
 }
 
-auto Game::Win() -> bool
+auto Game::CheckVictory() -> bool
 {
     for (size_t row = 0; row < grid.Rows(); ++row)
     {
@@ -70,6 +68,7 @@ auto Game::Win() -> bool
         {
             if (grid.GetTile(row, col).value == 2048)
             {
+                state = GameState::Victory;
                 return true;
             }
         }
@@ -78,7 +77,7 @@ auto Game::Win() -> bool
     return false;
 }
 
-auto Game::Lose() -> bool
+auto Game::CheckGameOver() -> bool
 {
     for (size_t row = 0; row < grid.Rows(); ++row)
     {
@@ -94,6 +93,7 @@ auto Game::Lose() -> bool
 
             for (const Tile &neigh : grid.AdjacentTiles(row, col))
             {
+                // there are still tiles that can be merged
                 if (tile.value == neigh.value)
                 {
                     return false;
@@ -102,7 +102,19 @@ auto Game::Lose() -> bool
         }
     }
 
+    state = GameState::GameOver;
     return true;
+}
+
+auto Game::Update() -> bool
+{
+    if (score > best_score)
+    {
+        best_score = score;
+    }
+
+    Spawn();
+    return CheckGameOver() || CheckVictory();
 }
 
 auto Game::MoveRow(const size_t row, const Direction dir) -> uint8_t

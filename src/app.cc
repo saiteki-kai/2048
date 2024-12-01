@@ -59,65 +59,49 @@ void Application::Run()
     Quit();
 }
 
-void Application::CheckGameState()
-{
-    if (game.Lose())
-    {
-        state = GameState::GameOver;
-    }
-
-    if (game.Win())
-    {
-        state = GameState::Victory;
-    }
-}
-
 auto Application::HandleKeyDownEvent(const SDL_Event &event) -> bool
 {
     if (event.key.key == SDLK_R)
     {
         game.Reset();
-        state = GameState::Playing;
         return false;
     }
 
-    switch (state)
+    if (game.State() == GameState::Startup)
     {
-    case GameState::Startup:
-        state = GameState::Playing;
         game.Start();
         return false;
-    case GameState::GameOver:
+    }
+
+    if (game.State() == GameState::GameOver || game.State() == GameState::Victory)
+    {
         return true;
-    case GameState::Playing:
+    }
+
+    switch (event.key.key)
+    {
+    case SDLK_DOWN:
+    case SDLK_S:
+        game.Move(Direction::DOWN);
+        break;
+    case SDLK_UP:
+    case SDLK_W:
+        game.Move(Direction::UP);
+        break;
+    case SDLK_LEFT:
+    case SDLK_A:
+        game.Move(Direction::LEFT);
+        break;
+    case SDLK_RIGHT:
+    case SDLK_D:
+        game.Move(Direction::RIGHT);
+        break;
     default:
-        switch (event.key.key)
-        {
-        case SDLK_DOWN:
-        case SDLK_S:
-            game.Move(Direction::DOWN);
-            break;
-        case SDLK_UP:
-        case SDLK_W:
-            game.Move(Direction::UP);
-            break;
-        case SDLK_LEFT:
-        case SDLK_A:
-            game.Move(Direction::LEFT);
-            break;
-        case SDLK_RIGHT:
-        case SDLK_D:
-            game.Move(Direction::RIGHT);
-            break;
-        default:
-            return false;
-        }
-
-        game.Spawn();
-        CheckGameState();
-
         return false;
     }
+
+    game.Update();
+    return false;
 }
 
 void Application::PoolEvents(SDL_Event &event)
@@ -127,13 +111,12 @@ void Application::PoolEvents(SDL_Event &event)
         if (event.type == SDL_EVENT_QUIT)
         {
             running = false;
+            break;
         }
-        else if (event.type == SDL_EVENT_KEY_DOWN)
+
+        if (event.type == SDL_EVENT_KEY_DOWN && HandleKeyDownEvent(event))
         {
-            if (HandleKeyDownEvent(event))
-            {
-                break;
-            }
+            break;
         }
     }
 }
@@ -145,6 +128,8 @@ void Application::Render()
     game_renderer->DrawBackground(app_layout.grid_layout.bg_color);
     game_renderer->DrawScoreBoard(game.Score(), game.BestScore(), app_layout.score_board_layout);
     game_renderer->DrawGrid(game.GetGrid(), app_layout.grid_layout);
+
+    const auto state = game.State();
 
     if (state == GameState::Startup)
     {
