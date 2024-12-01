@@ -1,10 +1,12 @@
 #pragma once
 
 #include "game.h"
+#include "game_renderer.h"
 #include "layout.h"
 
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
+#include <memory>
 
 enum class GameState : uint8_t
 {
@@ -13,24 +15,26 @@ enum class GameState : uint8_t
     Playing
 };
 
-class Application
+struct Application
 {
   private:
     Game game;
-    TTF_Font *font;
+    TTF_Font *font = nullptr;
     SDL_Window *window = nullptr;
     SDL_Renderer *renderer = nullptr;
-    GameState state = GameState::Init;
     ApplicationLayout app_layout;
+    std::unique_ptr<GameRenderer> game_renderer;
+    GameState state = GameState::Startup;
     bool running = false;
 
-  public:
-    Application();
-    ~Application();
-
-    void Run();
-    void OnStart();
-    void OnRender();
-    void OnUpdate();
+  private:
+    void Init();
+    void Quit() const;
     void PoolEvents(SDL_Event &event);
+    auto HandleKeyDownEvent(const SDL_Event &event) -> bool;
+    void CheckGameState();
+    void Render();
+
+  public:
+    void Run();
 };

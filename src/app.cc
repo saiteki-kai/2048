@@ -4,7 +4,7 @@
 #include <cmath>
 #include <iostream>
 
-Application::Application()
+void Application::Init()
 {
     SDL_Init(SDL_INIT_VIDEO);
 
@@ -27,9 +27,11 @@ Application::Application()
     }
 
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+
+    game_renderer = std::make_unique<GameRenderer>(renderer, font);
 }
 
-Application::~Application()
+void Application::Quit() const
 {
     TTF_CloseFont(font);
     TTF_Quit();
@@ -41,37 +43,81 @@ Application::~Application()
 
 void Application::Run()
 {
-    OnStart();
+    Init();
+
+    running = true;
 
     SDL_Event event;
 
     while (running)
     {
         PoolEvents(event);
-        OnRender();
+        Render();
         SDL_Delay(16);
     }
+
+    Quit();
 }
 
-void Application::OnUpdate()
+void Application::CheckGameState()
 {
-    game.Spawn();
-
     if (game.Lose())
     {
-        std::cout << "Game Over\n";
         state = GameState::GameOver;
     }
 
     if (game.Win())
     {
-        std::cout << "Win\n";
+        state = GameState::Victory;
     }
 }
 
-void Application::OnStart()
+auto Application::HandleKeyDownEvent(const SDL_Event &event) -> bool
 {
-    running = true;
+    if (event.key.key == SDLK_R)
+    {
+        game.Reset();
+        state = GameState::Playing;
+        return false;
+    }
+
+    switch (state)
+    {
+    case GameState::Startup:
+        state = GameState::Playing;
+        game.Start();
+        return false;
+    case GameState::GameOver:
+        return true;
+    case GameState::Playing:
+    default:
+        switch (event.key.key)
+        {
+        case SDLK_DOWN:
+        case SDLK_S:
+            game.Move(Direction::DOWN);
+            break;
+        case SDLK_UP:
+        case SDLK_W:
+            game.Move(Direction::UP);
+            break;
+        case SDLK_LEFT:
+        case SDLK_A:
+            game.Move(Direction::LEFT);
+            break;
+        case SDLK_RIGHT:
+        case SDLK_D:
+            game.Move(Direction::RIGHT);
+            break;
+        default:
+            return false;
+        }
+
+        game.Spawn();
+        CheckGameState();
+
+        return false;
+    }
 }
 
 void Application::PoolEvents(SDL_Event &event)
@@ -84,59 +130,21 @@ void Application::PoolEvents(SDL_Event &event)
         }
         else if (event.type == SDL_EVENT_KEY_DOWN)
         {
-            if (event.key.key == SDLK_R)
+            if (HandleKeyDownEvent(event))
             {
-                game.Reset();
-                state = GameState::Playing;
-            }
-
-            if (state == GameState::GameOver)
-            {
-                break;
-            }
-
-            if (state == GameState::Init)
-            {
-                state = GameState::Playing;
-                game.Start();
-                continue;
-            }
-
-            switch (event.key.key)
-            {
-            case SDLK_DOWN:
-            case SDLK_S:
-                game.Move(Direction::DOWN);
-                OnUpdate();
-                break;
-            case SDLK_UP:
-            case SDLK_W:
-                game.Move(Direction::UP);
-                OnUpdate();
-                break;
-            case SDLK_LEFT:
-            case SDLK_A:
-                game.Move(Direction::LEFT);
-                OnUpdate();
-                break;
-            case SDLK_RIGHT:
-            case SDLK_D:
-                game.Move(Direction::RIGHT);
-                OnUpdate();
-                break;
-            default:
-                // Nothing to handle
                 break;
             }
         }
     }
 }
 
-void Application::OnRender()
+void Application::Render()
 {
     SDL_RenderClear(renderer);
 
-    const auto game_renderer = GameRenderer(renderer, font); // TODO: (Refactor) init in the constructor
+    game_renderer->DrawBackground(app_layout.grid_layout.bg_color);
+    game_renderer->DrawScoreBoard(game.Score(), game.BestScore(), app_layout.score_board_layout);
+    game_renderer->DrawGrid(game.GetGrid(), app_layout.grid_layout);
 
     game_renderer.DrawBackground(app_layout.grid_layout.bg_color);
     game_renderer.DrawScoreBoard(game.Score(), game.BestScore(), app_layout.score_board_layout);
@@ -144,11 +152,11 @@ void Application::OnRender()
 
     if (state == GameState::Init)
     {
-        game_renderer.DrawInitScreen(app_layout.message_layout);
+        game_renderer->DrawInitScreen(app_layout.message_layout);
     }
     else if (state == GameState::GameOver)
     {
-        game_renderer.DrawGameOver(app_layout.message_layout);
+        game_renderer->DrawEndGameMessage(app_layout.message_layout);
     }
 
     // display
