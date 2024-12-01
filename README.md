@@ -52,7 +52,8 @@ Run the game:
 - [x] Game states for game over, win, start showing keyboard instruction
 - [x] Move hardcoded variables to layouts
 - [x] Adaptable font size
-- [x] Improve UI
+- [x] Improve
+- [ ] Refactor Game::MoveCol and Game::MoveRow
 - [ ] Game tests
 - [ ] Improve memory usage (reallocations, rendering cache)
 - [ ] Rounded borders
