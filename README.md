@@ -9,6 +9,8 @@ The game is built using the SDL3 and SDL3_ttf libraries.
 This is the first serious project I've taken on in C++.
 I wanted to challenge myself by building a simple game while exploring low-level development and C++ tools.
 
+<img src="images/example.png" width="50%" alt="game screenshot">
+
 ## Requirements
 
 - C++20 or later
@@ -54,6 +56,7 @@ Run the game:
 - [x] Adaptable font size
 - [x] Improve
 - [ ] Refactor Game::MoveCol and Game::MoveRow
+- [ ] Handle inputs correctly (fix mouse freeze while playing)
 - [ ] Game tests
 - [ ] Improve memory usage (reallocations, rendering cache)
 - [ ] Rounded borders
