@@ -111,12 +111,23 @@ void GameRenderer::DrawInitScreen(const MessageLayout &layout) const
     DrawText(subtitle_box, layout.SubtitleRect());
 }
 
-void GameRenderer::DrawGameOver(const MessageLayout &layout) const
+void GameRenderer::DrawEndGameMessage(const MessageLayout &layout, const GameState &state) const
 {
     FillRect(renderer, &layout.rect, layout.bg_color);
 
-    constexpr std::string_view title = "Game Over!";
-    constexpr std::string_view subtitle = "Press 'R' to play again";
+    std::string_view title;
+    std::string_view subtitle;
+
+    if (state == GameState::GameOver)
+    {
+        title = "Game Over!";
+        subtitle = "Press 'R' to play again";
+    }
+    else
+    {
+        title = "Congratulations!";
+        subtitle = "Press 'R' to play again";
+    }
 
     const auto title_box = TextBox(title, layout.title_size, 0, layout.fg_color, TextAlignment::Center, false);
     DrawText(title_box, layout.TitleRect());

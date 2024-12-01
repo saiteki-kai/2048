@@ -10,9 +10,10 @@
 
 enum class GameState : uint8_t
 {
-    Init,
+    Startup,
     GameOver,
-    Playing
+    Playing,
+    Victory,
 };
 
 struct Application

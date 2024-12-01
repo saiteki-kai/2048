@@ -49,5 +49,5 @@ class GameRenderer
     void DrawGrid(const Grid &grid, const GridLayout &layout) const;
     void DrawScoreBoard(uint32_t score, uint32_t best, const ScoreBoardLayout &layout) const;
     void DrawInitScreen(const MessageLayout &layout) const;
-    void DrawGameOver(const MessageLayout &layout) const;
+    void DrawEndGameMessage(const MessageLayout &layout, const GameState &state) const;
 };

@@ -146,17 +146,13 @@ void Application::Render()
     game_renderer->DrawScoreBoard(game.Score(), game.BestScore(), app_layout.score_board_layout);
     game_renderer->DrawGrid(game.GetGrid(), app_layout.grid_layout);
 
-    game_renderer.DrawBackground(app_layout.grid_layout.bg_color);
-    game_renderer.DrawScoreBoard(game.Score(), game.BestScore(), app_layout.score_board_layout);
-    game_renderer.DrawGrid(game.GetGrid(), app_layout.grid_layout);
-
-    if (state == GameState::Init)
+    if (state == GameState::Startup)
     {
         game_renderer->DrawInitScreen(app_layout.message_layout);
     }
-    else if (state == GameState::GameOver)
+    else if (state == GameState::GameOver || state == GameState::Victory)
     {
-        game_renderer->DrawEndGameMessage(app_layout.message_layout);
+        game_renderer->DrawEndGameMessage(app_layout.message_layout, state);
     }
 
     // display
