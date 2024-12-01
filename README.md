@@ -49,9 +49,11 @@ Run the game:
 ## Next Steps
 
 - [x] Style / layout refactoring
-- [ ] Game states for game over, win, start showing keyboard instruction
+- [x] Game states for game over, win, start showing keyboard instruction
+- [ ] Move hardcoded variables to layouts
 - [x] Adaptable font size
+- [ ] Improve UI
 - [ ] Game tests
-- [ ] Improve memory usage
+- [ ] Improve memory usage (reallocations, rendering cache)
 - [ ] Rounded borders
 - [ ] Animations

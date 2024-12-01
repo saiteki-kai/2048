@@ -60,7 +60,7 @@ void Application::OnUpdate()
     if (game.Lose())
     {
         std::cout << "Game Over\n";
-        game.Reset();
+        state = GameState::GameOver;
     }
 
     if (game.Win())
@@ -72,7 +72,6 @@ void Application::OnUpdate()
 void Application::OnStart()
 {
     running = true;
-    game.Start();
 }
 
 void Application::PoolEvents(SDL_Event &event)
@@ -85,6 +84,24 @@ void Application::PoolEvents(SDL_Event &event)
         }
         else if (event.type == SDL_EVENT_KEY_DOWN)
         {
+            if (event.key.key == SDLK_R)
+            {
+                game.Reset();
+                state = GameState::Playing;
+            }
+
+            if (state == GameState::GameOver)
+            {
+                break;
+            }
+
+            if (state == GameState::Init)
+            {
+                state = GameState::Playing;
+                game.Start();
+                continue;
+            }
+
             switch (event.key.key)
             {
             case SDLK_DOWN:
@@ -107,8 +124,6 @@ void Application::PoolEvents(SDL_Event &event)
                 game.Move(Direction::RIGHT);
                 OnUpdate();
                 break;
-            case SDLK_R:
-                game.Reset();
             default:
                 // Nothing to handle
                 break;
@@ -121,10 +136,20 @@ void Application::OnRender()
 {
     SDL_RenderClear(renderer);
 
-    const auto game_renderer = GameRenderer(renderer, font); // Refactor: init in the constructor
+    const auto game_renderer = GameRenderer(renderer, font); // TODO: (Refactor) init in the constructor
+
     game_renderer.DrawBackground(app_layout.grid_layout.bg_color);
     game_renderer.DrawScoreBoard(game.Score(), game.BestScore(), app_layout.score_board_layout);
     game_renderer.DrawGrid(game.GetGrid(), app_layout.grid_layout);
+
+    if (state == GameState::Init)
+    {
+        game_renderer.DrawInitScreen(app_layout.message_layout);
+    }
+    else if (state == GameState::GameOver)
+    {
+        game_renderer.DrawGameOver(app_layout.message_layout);
+    }
 
     // display
     SDL_RenderPresent(renderer);

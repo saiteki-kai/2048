@@ -3,6 +3,27 @@
 #include <SDL3/SDL.h>
 #include <array>
 
+struct MessageLayout
+{
+    SDL_Color fg_color = {255, 255, 255, 0xff};
+    SDL_Color bg_color = {0, 0, 0, 150};
+
+    SDL_FRect rect;
+
+    float title_size = 60;
+    float subtitle_size = 35;
+    float text_height = 50;
+    float vertical_gap = 60;
+
+    explicit MessageLayout(const SDL_FRect &rect) : rect(rect)
+    {
+    }
+
+    [[nodiscard]] auto TitleRect() const -> SDL_FRect;
+    [[nodiscard]] auto SubtitleRect() const -> SDL_FRect;
+    [[nodiscard]] auto TotalSize() const -> float;
+};
+
 struct ScoreBoardLayout
 {
     SDL_Color score_bg_color = {234, 231, 217, 0xff};
@@ -76,8 +97,9 @@ struct ApplicationLayout
 
     GridLayout grid_layout;
     ScoreBoardLayout score_board_layout;
+    MessageLayout message_layout;
 
-    ApplicationLayout() : grid_layout(GridLayout(GridRect())), score_board_layout(ScoreBoardRect())
+    ApplicationLayout() : grid_layout(GridRect()), score_board_layout(ScoreBoardRect()), message_layout(GridRect())
     {
     }
 

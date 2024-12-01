@@ -40,7 +40,7 @@ class GameRenderer
 
   private:
     void DrawTile(const Tile &tile, const SDL_FRect &rect) const;
-    void DrawText(const TextBox &text_box, const SDL_FRect &rect, const SDL_Color &background) const;
+    void DrawText(const TextBox &text_box, const SDL_FRect &rect) const;
     void DrawScoreBox(const ScoreBox &box, const SDL_FRect &rect) const;
 
   public:
@@ -48,4 +48,6 @@ class GameRenderer
     void DrawBackground(const SDL_Color &color) const;
     void DrawGrid(const Grid &grid, const GridLayout &layout) const;
     void DrawScoreBoard(uint32_t score, uint32_t best, const ScoreBoardLayout &layout) const;
+    void DrawInitScreen(const MessageLayout &layout) const;
+    void DrawGameOver(const MessageLayout &layout) const;
 };

@@ -1,5 +1,4 @@
 #include "game_renderer.h"
-
 #include "layout.h"
 
 #include <cmath>
@@ -8,7 +7,7 @@ GameRenderer::GameRenderer(SDL_Renderer *renderer, TTF_Font *font) : renderer(re
 {
 }
 
-void GameRenderer::DrawText(const TextBox &text_box, const SDL_FRect &rect, const SDL_Color &background) const
+void GameRenderer::DrawText(const TextBox &text_box, const SDL_FRect &rect) const
 {
     auto [x, y, w, h] = rect;
     x = rect.x + text_box.padding;
@@ -17,14 +16,14 @@ void GameRenderer::DrawText(const TextBox &text_box, const SDL_FRect &rect, cons
     h = rect.h - 2 * text_box.padding;
 
     TTF_SetFontSize(font, text_box.size);
-    SDL_Surface *surface = TTF_RenderText_LCD(font, text_box.text.c_str(), 0, text_box.color, background);
+    SDL_Surface *surface = TTF_RenderText_Blended(font, text_box.text.c_str(), 0, text_box.color);
 
     if (text_box.fit_container)
     {
         const auto font_size = AdjustFontSizeToFitRect(surface, font, text_box.text, text_box.size, h, w);
 
         TTF_SetFontSize(font, font_size);
-        surface = TTF_RenderText_LCD(font, text_box.text.c_str(), 0, text_box.color, background);
+        surface = TTF_RenderText_Blended(font, text_box.text.c_str(), 0, text_box.color);
     }
 
     const auto text_width = static_cast<float>(surface->w);
@@ -43,8 +42,8 @@ void GameRenderer::DrawText(const TextBox &text_box, const SDL_FRect &rect, cons
 void GameRenderer::DrawScoreBox(const ScoreBox &box, const SDL_FRect &rect) const
 {
     FillRect(renderer, &rect, box.bg_color);
-    DrawText(box.label_text, rect, box.bg_color);
-    DrawText(box.score_text, rect, box.bg_color);
+    DrawText(box.label_text, rect);
+    DrawText(box.score_text, rect);
 }
 
 void GameRenderer::DrawTile(const Tile &tile, const SDL_FRect &rect) const
@@ -59,7 +58,7 @@ void GameRenderer::DrawTile(const Tile &tile, const SDL_FRect &rect) const
     if (tile.value != 0)
     {
         const auto textbox = TextBox(std::to_string(tile.value), 50, 20, foreground, TextAlignment::Center, true);
-        DrawText(textbox, rect, background);
+        DrawText(textbox, rect);
     }
 }
 
@@ -96,4 +95,32 @@ void GameRenderer::DrawScoreBoard(const uint32_t score, const uint32_t best, con
 void GameRenderer::DrawBackground(const SDL_Color &color) const
 {
     FillRect(renderer, nullptr, color);
+}
+
+void GameRenderer::DrawInitScreen(const MessageLayout &layout) const
+{
+    FillRect(renderer, &layout.rect, layout.bg_color);
+
+    constexpr std::string_view title = "Press any key to start";
+    constexpr std::string_view subtitle = "Use WASD or arrow keys to move tiles";
+
+    const auto title_box = TextBox(title, layout.title_size, 0, layout.fg_color, TextAlignment::Center, true);
+    DrawText(title_box, layout.TitleRect());
+
+    const auto subtitle_box = TextBox(subtitle, layout.subtitle_size, 10, layout.fg_color, TextAlignment::Center, true);
+    DrawText(subtitle_box, layout.SubtitleRect());
+}
+
+void GameRenderer::DrawGameOver(const MessageLayout &layout) const
+{
+    FillRect(renderer, &layout.rect, layout.bg_color);
+
+    constexpr std::string_view title = "Game Over!";
+    constexpr std::string_view subtitle = "Press 'R' to play again";
+
+    const auto title_box = TextBox(title, layout.title_size, 0, layout.fg_color, TextAlignment::Center, false);
+    DrawText(title_box, layout.TitleRect());
+
+    const auto subtitle_box = TextBox(subtitle, layout.subtitle_size, 0, layout.fg_color, TextAlignment::Center, false);
+    DrawText(subtitle_box, layout.SubtitleRect());
 }

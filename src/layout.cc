@@ -1,5 +1,34 @@
 #include "layout.h"
 
+auto MessageLayout::TotalSize() const -> float
+{
+    return text_height * 2 + vertical_gap;
+}
+
+auto MessageLayout::TitleRect() const -> SDL_FRect
+{
+    const float total_height = TotalSize();
+
+    SDL_FRect title_rect;
+    title_rect.x = rect.x;
+    title_rect.y = rect.y + (rect.h - total_height) / 2 - text_height;
+    title_rect.h = text_height;
+    title_rect.w = rect.w;
+
+    return title_rect;
+}
+
+auto MessageLayout::SubtitleRect() const -> SDL_FRect
+{
+    SDL_FRect subtitle_rect;
+    subtitle_rect.x = rect.x;
+    subtitle_rect.y = rect.y + TotalSize() + text_height + vertical_gap;
+    subtitle_rect.h = text_height;
+    subtitle_rect.w = rect.w;
+
+    return subtitle_rect;
+}
+
 auto ScoreBoardLayout::ScoreRect() const -> SDL_FRect
 {
     return SDL_FRect(rect.x, rect.y, box_width, box_height);
